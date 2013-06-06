@@ -89,7 +89,7 @@ def doit(fig, ten, three):
         parallel(ax, ten, three, mins, maxes, cols)
 
         if ii == 1:
-            ax.legend(loc='right', bbox_to_anchor=(naxes + 1.0, 0.5), 
+            ax.legend(loc='right', bbox_to_anchor=(naxes + 1.4, 0.5), 
                       bbox_transform=ax.transData)
 
         if ii == 0:
@@ -110,5 +110,6 @@ if __name__ == "__main__":
     three = recalc.reevaluate(27,3,0.1)
     ten = recalc.reevaluate(27,10,1.0)
     doit(fig, ten, three)
+    fig.subplots_adjust(hspace=0, bottom=0.15, top=0.95)
     fig.savefig("parallel.png")
 # vim:ts=4:sw=4:expandtab:ai:colorcolumn=68:number:fdm=indent
