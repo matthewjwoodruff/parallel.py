@@ -24,39 +24,47 @@ import matplotlib
 import recalc
 import pandas
 from matplotlib.backends import backend_agg as agg
+from matplotlib.backends import backend_svg as svg
 import numpy
 
-def parallel(ax, ten, three, mins, maxes, cols):
+def parallel(ax, ten, three, mins, maxes, cols, lines, axes):
     naxes = 10
     echs = range(naxes)
-    ax.vlines(echs, -0.1, 1.1, colors=(0.6,0.6,0.6))
     ax.set_ylim(-0.15,1.1)
     ax.set_yticks([])
     ax.set_yticklabels([])
     ax.set_xticklabels([])
-    ax.set_xticks(echs)
+    ax.set_xticks([])
 
-    for ii in range(len(ten)):
-        row = ten.irow(ii)[cols].values
-        endpoints = [(row[jj] - mins[jj]) / (maxes[jj] - mins[jj]) for jj in range(naxes)]
-        ll = ax.plot(echs, endpoints, color=(1.0,0.0,0.0,0.05))    
+    if axes:
+        ax.vlines(echs, -0.1, 1.1, colors=(0.6,0.6,0.6))
+        ax.set_xticks(echs)
+
+    if lines:
+        for ii in range(len(ten)):
+            row = ten.irow(ii)[cols].values
+            endpoints = [(row[jj] - mins[jj]) / (maxes[jj] - mins[jj]) for jj in range(naxes)]
+            ll = ax.plot(echs, endpoints, color=(1.0,0.0,0.0,0.05))    
     ll = ax.plot(echs, [2] * naxes, color=(1.0,0.0,0.0))
     ll[0].set_label("ten")
 
-    for ii in range(len(three)):
-        row = three.irow(ii)[cols].values
-        endpoints = [(row[jj] - mins[jj]) / (maxes[jj] - mins[jj]) for jj in range(naxes)]
-        ll = ax.plot(echs, endpoints, color=(0.0,0.0,1.0,0.2))
+    if lines:
+        for ii in range(len(three)):
+            row = three.irow(ii)[cols].values
+            endpoints = [(row[jj] - mins[jj]) / (maxes[jj] - mins[jj]) for jj in range(naxes)]
+            ll = ax.plot(echs, endpoints, color=(0.0,0.0,1.0,0.2))
 
     ll = ax.plot(echs, [2] * naxes, color=(0.0,0.0,1.0))
     ll[0].set_label("three")
     ax.set_xlim(0, naxes + 1.5)
-    tix = ax.get_xticklines()
-    for tic in tix:
-        tic.set_color((0,0,0,0))
+
+    if axes:
+        tix = ax.get_xticklines()
+        for tic in tix:
+            tic.set_color((0,0,0,0))
 
 
-def doit(fig, ten, three):
+def doit(fig, ten, three, lines=True, axes=True):
     naxes = 10
     table = pandas.concat([three, ten])
     outputnames = recalc.outputnames()
@@ -86,30 +94,36 @@ def doit(fig, ten, three):
     for ii in range(3):
         cols = groups[ii]
         ax = fig.add_subplot(3,1,ii+1, frameon=False)
-        parallel(ax, ten, three, mins, maxes, cols)
+        parallel(ax, ten, three, mins, maxes, cols, lines, axes)
 
-        if ii == 1:
+        if ii == 1 and axes:
             ax.legend(loc='right', bbox_to_anchor=(naxes + 1.4, 0.5), 
-                      bbox_transform=ax.transData)
+                      bbox_transform=ax.transData, title="Objectives")
 
-        if ii == 0:
+        if ii == 0 and axes:
             for jj in range(naxes):
                 form = formats.get(precisions[jj], "{0:.0f}")
                 ax.text(jj, 1.1, form.format(viewmaxes[jj]), ha="center",
                         va="bottom")
         
-    for jj in range(naxes):
-        form = formats.get(precisions[jj], "{0:.0f}")
-        ax.text(jj, -0.15, form.format(viewmins[jj]), ha="center",
-                va="bottom")
-    ax.set_xticklabels(recalc.objnames(10), rotation=270)
+    if axes:
+        for jj in range(naxes):
+            form = formats.get(precisions[jj], "{0:.0f}")
+            ax.text(jj, -0.15, form.format(viewmins[jj]), ha="center",
+                    va="bottom")
+        ax.set_xticklabels(recalc.objnames(10), rotation=270)
 
 if __name__ == "__main__":
     fig = matplotlib.figure.Figure(figsize=(9, 6))
     agg.FigureCanvasAgg(fig)
     three = recalc.reevaluate(27,3,0.1)
     ten = recalc.reevaluate(27,10,1.0)
-    doit(fig, ten, three)
+    doit(fig, ten, three, True, False)
     fig.subplots_adjust(hspace=0, bottom=0.15, top=0.95)
-    fig.savefig("parallel.png")
+    fig.savefig("parallel")
+    fig = matplotlib.figure.Figure(figsize=(9,6))
+    svg.FigureCanvasSVG(fig)
+    doit(fig, ten, three, False, True)
+    fig.savefig("parallel")
+
 # vim:ts=4:sw=4:expandtab:ai:colorcolumn=68:number:fdm=indent
