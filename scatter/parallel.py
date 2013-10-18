@@ -216,6 +216,7 @@ def init_figures(issplit, isvector, naxes, nplots):
     nplots: number of subplots, used for sizing
     """
     figsize = (3 + 0.6 * naxes, 2 + (4/3) * nplots)
+#    figsize = (3 + 0.6 * naxes, 2 + (10/3) * nplots)
     if issplit:
         raster = matplotlib.figure.Figure(figsize=figsize)
         agg.FigureCanvasAgg(raster)
@@ -414,13 +415,13 @@ def cli(argv):
 #            print("drawing lines on axes {0} with color {1} and limits {2}".format(rax, color, sublimits))
             draw_lines(rax, subtable, sublimits, color=color, lw=lw)
         if ii == nplots // 2:
-            draw_legend(vax, naxes, args.names, args.colors, "File")
+            draw_legend(vax, naxes, args.names, args.colors, "DVs")
 
         drawlimits = []
         for _ in range(len(limits)):
             drawlimits.append(["", ""])
 
-        dlp = zip(drawlimits, limits, args.precisions)
+        dlp = list(zip(drawlimits, limits, args.precisions))
         if ii == 0:
             for dl, lim, prec in dlp:
                 dl[1] = format_of(prec).format(lim[1])
