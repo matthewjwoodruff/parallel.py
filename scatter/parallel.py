@@ -127,18 +127,22 @@ def draw_lines(ax, table, limits, **kwargs):
     xs = range(len(limits))
     color = kwargs.get("color", 'k')
     lw = kwargs.get("lw", 1)
-    for row in table.itertuples(False):
-        zorder = random.random()
-        ys = [(x-l)/(h-l) for x, (l, h) in zip(row, limits)]
-        ax.plot(xs, ys, color=color, zorder=zorder, lw=lw)
+    marker = kwargs.get("marker", "-")
+    zoffset = kwargs.get("zorder", 0.0)
 
-def draw_legend(ax, naxes, names, colors, title):
+    for row in table.itertuples(False):
+        zorder = random.random() + zoffset
+        ys = [(x-l)/(h-l) for x, (l, h) in zip(row, limits)]
+        ax.plot(xs, ys, marker, color=color, zorder=zorder, lw=lw, markersize=10)
+
+def draw_legend(ax, naxes, names, colors, title, **kwargs):
     """
     first draw lines off the plot to feed the legend,
     then make the legend itself
 
     ax: a matplotlib axes object for drawing
     """
+    markers = kwargs.get("marker", ["-"]*len(names))
     newcolors = []
     for color in colors:
         if len(color) == 4:
@@ -148,12 +152,12 @@ def draw_legend(ax, naxes, names, colors, title):
         else:
             newcolors.append(color)
 
-    for (name, color) in zip(names, newcolors):
-        ax.plot([-10, -9], [0, 0], lw=2, color=color, label=name)
+    for (name, color, mark) in zip(names, newcolors, markers):
+        ax.plot([-10, -9], [0, 0], mark, lw=2, color=color, label=name)
 
     anchor = (1.14*naxes, 0.5)
     ax.legend(loc='right', bbox_to_anchor=(anchor),
-              bbox_transform=ax.transData, title=title)
+              bbox_transform=ax.transData, title=title, numpoints=1)
 
 def desired_columns(table, columns):
     """
@@ -216,7 +220,7 @@ def init_figures(issplit, isvector, naxes, nplots):
     nplots: number of subplots, used for sizing
     """
     figsize = (3 + 0.6 * naxes, 2 + (4/3) * nplots)
-#    figsize = (3 + 0.6 * naxes, 2 + (10/3) * nplots)
+    figsize = (3 + 0.6 * naxes, 2 + (10/3) * nplots)
     if issplit:
         raster = matplotlib.figure.Figure(figsize=figsize)
         agg.FigureCanvasAgg(raster)
@@ -307,6 +311,12 @@ def get_args(argv):
     parser.add_argument("-W", "--linewidth", type=float, nargs="+",
                         help="linewidths for solution sets")
 
+    parser.add_argument("-k", "--marker", nargs="+",
+                        help="markers for solution sets")
+
+    parser.add_argument("-z", "--zorder", nargs="+", type=float,
+                        help="zorder offsets for solution sets")
+
     args = parser.parse_args(argv)
     if args.columns is not None:
         args.columns = rerange(args.columns)
@@ -355,6 +365,23 @@ def get_args(argv):
         args.linewidth = [1] * len(args.files)
     elif len(args.linewidth) < len(args.files):
         args.linewidth.extend([1] * (len(args.files) - len(args.linewidth)))
+
+    if args.marker is None:
+        args.marker = ["-"] * len(args.files)
+    elif len(args.marker) < len(args.files):
+        args.marker.extend(["-"] * (len(args.files) - len(args.marker)))
+
+    valid_markers = ["-", "--", "-.", ":", ".", ",", "o", "v", "^", "<", 
+                     ">", "1", "2", "3", "4", "s", "p", "*", "h", "H", 
+                     "+", "x", "D", "d", "|", "_"]
+    for ii in range(len(args.marker)):
+        if args.marker[ii] not in valid_markers:
+            args.marker[ii] = "-"
+
+    if args.zorder is None:
+        args.zorder = [0.0] * len(args.files)
+    elif len(args.zorder) < len(args.files):
+        args.zorder.extend([0.0] * (len(args.files) - len(args.marker)))
 
     return args
 
@@ -408,14 +435,24 @@ def cli(argv):
         rax.set_xlim((0, xmax))
         vax.set_xlim((0, xmax))
 
-        for table, color, lw in zip(tables, args.colors, args.linewidth):
+        for tt in range(len(tables)):
+            table = tables[tt]
+            color = args.colors[tt]
+            lw = args.linewidth[tt]
+            marker = args.marker[tt]
+            zorder = args.zorder[tt]
+
             indices = range(ii*naxes, min(ii*naxes + naxes, ncolumns))
             subtable = table.select(lambda cc: cc in indices, axis=1)
             sublimits = [limits[jj] for jj in indices]
 #            print("drawing lines on axes {0} with color {1} and limits {2}".format(rax, color, sublimits))
-            draw_lines(rax, subtable, sublimits, color=color, lw=lw)
+            draw_lines(
+                rax, subtable, sublimits, 
+                color=color, lw=lw, marker=marker,
+                zorder=zorder
+            )
         if ii == nplots // 2:
-            draw_legend(vax, naxes, args.names, args.colors, "DVs")
+            draw_legend(vax, naxes, args.names, args.colors, "Formulation", marker=args.marker)
 
         drawlimits = []
         for _ in range(len(limits)):
