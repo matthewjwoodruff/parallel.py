@@ -132,8 +132,8 @@ def draw_lines(ax, table, limits, **kwargs):
 
     if marker in ['o', 'v', '^', '<', '>', '8', 
                   's', 'p', '*', 'h', 'H', 'D', 'd']:
-        plot = lambda ys: ax.scatter(xs, ys, s=60, marker=marker, 
-                                     facecolor=color, edgecolor='w', 
+        plot = lambda ys: ax.scatter(xs, ys, s=70, marker=marker, 
+                                     facecolor=color,
                                      zorder=zorder, lw=lw) 
     else:
         plot = lambda ys: ax.plot(xs, ys, marker, color=color, 
@@ -444,8 +444,8 @@ def cli(argv):
         prepare_axes(vax)
 
         xmax = 1.2*naxes
-        rax.set_xlim((0, xmax))
-        vax.set_xlim((0, xmax))
+        rax.set_xlim((-0.1, xmax))
+        vax.set_xlim((-0.1, xmax))
 
         for tt in range(len(tables)):
             table = tables[tt]
