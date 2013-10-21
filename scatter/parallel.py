@@ -130,10 +130,22 @@ def draw_lines(ax, table, limits, **kwargs):
     marker = kwargs.get("marker", "-")
     zoffset = kwargs.get("zorder", 0.0)
 
+    if marker in ['o', 'v', '^', '<', '>', '8', 
+                  's', 'p', '*', 'h', 'H', 'D', 'd']:
+        plot = lambda ys: ax.scatter(xs, ys, s=60, marker=marker, 
+                                     facecolor=color, edgecolor='w', 
+                                     zorder=zorder, lw=lw) 
+    else:
+        plot = lambda ys: ax.plot(xs, ys, marker, color=color, 
+                                  zorder=zorder, lw=lw, 
+                                  markersize=10)
+
     for row in table.itertuples(False):
         zorder = random.random() + zoffset
         ys = [(x-l)/(h-l) for x, (l, h) in zip(row, limits)]
-        ax.plot(xs, ys, marker, color=color, zorder=zorder, lw=lw, markersize=10)
+        plot(ys)
+#        ax.plot(xs, ys, marker, color=color, zorder=zorder, 
+#                lw=lw, markersize=10, markeredgecolor='w')
 
 def draw_legend(ax, naxes, names, colors, title, **kwargs):
     """
@@ -373,7 +385,7 @@ def get_args(argv):
 
     valid_markers = ["-", "--", "-.", ":", ".", ",", "o", "v", "^", "<", 
                      ">", "1", "2", "3", "4", "s", "p", "*", "h", "H", 
-                     "+", "x", "D", "d", "|", "_"]
+                     "8", "+", "x", "D", "d", "|", "_"]
     for ii in range(len(args.marker)):
         if args.marker[ii] not in valid_markers:
             args.marker[ii] = "-"
