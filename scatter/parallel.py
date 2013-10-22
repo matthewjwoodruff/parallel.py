@@ -132,7 +132,7 @@ def draw_lines(ax, table, limits, **kwargs):
 
     if marker in ['o', 'v', '^', '<', '>', '8', 
                   's', 'p', '*', 'h', 'H', 'D', 'd']:
-        plot = lambda ys: ax.scatter(xs, ys, s=70, marker=marker, 
+        plot = lambda ys: ax.scatter(xs, ys, s=180, marker=marker, 
                                      facecolor=color,
                                      zorder=zorder, lw=lw) 
     else:
@@ -144,8 +144,6 @@ def draw_lines(ax, table, limits, **kwargs):
         zorder = random.random() + zoffset
         ys = [(x-l)/(h-l) for x, (l, h) in zip(row, limits)]
         plot(ys)
-#        ax.plot(xs, ys, marker, color=color, zorder=zorder, 
-#                lw=lw, markersize=10, markeredgecolor='w')
 
 def draw_legend(ax, naxes, names, colors, title, **kwargs):
     """
@@ -165,7 +163,10 @@ def draw_legend(ax, naxes, names, colors, title, **kwargs):
             newcolors.append(color)
 
     for (name, color, mark) in zip(names, newcolors, markers):
-        ax.plot([-10, -9], [0, 0], mark, lw=2, color=color, label=name)
+        ax.plot([-10, -9], [0, 0], mark, lw=2, color=color, 
+                label=name, markersize=13)
+#        ax.plot(xs, ys, marker, color=color, zorder=zorder, 
+#                lw=lw, markersize=10, markeredgecolor='w')
 
     anchor = (1.14*naxes, 0.5)
     ax.legend(loc='right', bbox_to_anchor=(anchor),
@@ -444,8 +445,8 @@ def cli(argv):
         prepare_axes(vax)
 
         xmax = 1.2*naxes
-        rax.set_xlim((-0.1, xmax))
-        vax.set_xlim((-0.1, xmax))
+        rax.set_xlim((-0.15, xmax))
+        vax.set_xlim((-0.15, xmax))
 
         for tt in range(len(tables)):
             table = tables[tt]
