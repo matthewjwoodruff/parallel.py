@@ -232,8 +232,8 @@ def init_figures(issplit, isvector, naxes, nplots):
     naxes: number of axes, used for sizing
     nplots: number of subplots, used for sizing
     """
-    figsize = (3 + 0.6 * naxes, 2 + (4/3) * nplots)
-    figsize = (3 + 0.6 * naxes, 2 + (10/3) * nplots)
+    figsize = (3 + 0.5 * naxes, 2 + (4/3) * nplots)
+    figsize = (3 + 0.3 * naxes, 2 + (8/3) * nplots)
     if issplit:
         raster = matplotlib.figure.Figure(figsize=figsize)
         agg.FigureCanvasAgg(raster)
