@@ -106,12 +106,12 @@ def draw_axes(ax, names, limits):
         tick.set_color((0, 0, 0, 0))
     ax.vlines(echs, -0.1, 1.1, colors=(0.6, 0.6, 0.6))
 
-    ax.set_xticklabels(names, rotation=270)
+    ax.set_xticklabels(names, rotation=270, size="small")
 
     # label the limits
     for xx in echs:
-        ax.text(xx, -0.15, limits[xx][0], ha="center", va="bottom")
-        ax.text(xx, 1.1, limits[xx][1], ha="center", va="bottom")
+        ax.text(xx, -0.15, limits[xx][0], ha="center", va="bottom", size="x-small")
+        ax.text(xx, 1.1, limits[xx][1], ha="center", va="bottom", size="x-small")
  
 def draw_lines(ax, table, limits, **kwargs):
     """ 
@@ -132,7 +132,7 @@ def draw_lines(ax, table, limits, **kwargs):
 
     if marker in ['o', 'v', '^', '<', '>', '8', 
                   's', 'p', '*', 'h', 'H', 'D', 'd']:
-        plot = lambda ys: ax.scatter(xs, ys, s=180, marker=marker, 
+        plot = lambda ys: ax.scatter(xs, ys, s=120, marker=marker, 
                                      facecolor=color,
                                      zorder=zorder, lw=lw) 
     else:
@@ -164,13 +164,12 @@ def draw_legend(ax, naxes, names, colors, title, **kwargs):
 
     for (name, color, mark) in zip(names, newcolors, markers):
         ax.plot([-10, -9], [0, 0], mark, lw=2, color=color, 
-                label=name, markersize=13)
-#        ax.plot(xs, ys, marker, color=color, zorder=zorder, 
-#                lw=lw, markersize=10, markeredgecolor='w')
+                label=name, markersize=10)
 
-    anchor = (1.14*naxes, 0.5)
+    anchor = (1.20*naxes, 0.5)
     ax.legend(loc='right', bbox_to_anchor=(anchor),
-              bbox_transform=ax.transData, title=title, numpoints=1)
+              bbox_transform=ax.transData, title=title, numpoints=1,
+              fontsize="small")
 
 def desired_columns(table, columns):
     """
@@ -233,7 +232,7 @@ def init_figures(issplit, isvector, naxes, nplots):
     nplots: number of subplots, used for sizing
     """
     figsize = (3 + 0.5 * naxes, 2 + (4/3) * nplots)
-    figsize = (3 + 0.3 * naxes, 2 + (8/3) * nplots)
+    figsize = (3 + 0.3 * naxes, 2 + (4/3) * nplots)
     if issplit:
         raster = matplotlib.figure.Figure(figsize=figsize)
         agg.FigureCanvasAgg(raster)
@@ -445,8 +444,8 @@ def cli(argv):
         prepare_axes(vax)
 
         xmax = 1.2*naxes
-        rax.set_xlim((-0.15, xmax))
-        vax.set_xlim((-0.15, xmax))
+        rax.set_xlim((-0.30, xmax))
+        vax.set_xlim((-0.30, xmax))
 
         for tt in range(len(tables)):
             table = tables[tt]
@@ -483,6 +482,9 @@ def cli(argv):
             axis_names = [""]*naxes
         drawlimits = drawlimits[:naxes]
         draw_axes(vax, axis_names, drawlimits)
+
+    raster.subplots_adjust(bottom=0.2)
+    vector.subplots_adjust(bottom=0.2)
 
     raster.savefig(args.output)
     if vector != raster:
