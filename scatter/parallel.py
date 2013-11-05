@@ -74,10 +74,12 @@ def intrange(arg):
     else:
         return range(first, second+1)
 
-def prepare_axes(ax):
+def prepare_axes(ax, naxes):
     """ set up the axes """
     ax.set_frame_on(False)
     ax.set_ylim(-0.15, 1.1)
+    xmax = 1.02*(naxes-1)
+    ax.set_xlim((-0.30, xmax))
     ax.set_yticks([])
     ax.set_yticklabels([])
     ax.set_xticklabels([])
@@ -166,10 +168,10 @@ def draw_legend(ax, naxes, names, colors, title, **kwargs):
         ax.plot([-10, -9], [0, 0], mark, lw=2, color=color, 
                 label=name, markersize=10)
 
-    anchor = (1.20*naxes, 0.5)
-    ax.legend(loc='right', bbox_to_anchor=(anchor),
+    anchor = (0.5*(naxes-1), -0.8)
+    ax.legend(loc='center', bbox_to_anchor=(anchor),
               bbox_transform=ax.transData, title=title, numpoints=1,
-              fontsize="small")
+              fontsize="small", ncol=4)
 
 def desired_columns(table, columns):
     """
@@ -231,8 +233,8 @@ def init_figures(issplit, isvector, naxes, nplots):
     naxes: number of axes, used for sizing
     nplots: number of subplots, used for sizing
     """
-    figsize = (3 + 0.5 * naxes, 2 + (4/3) * nplots)
-    figsize = (3 + 0.3 * naxes, 2 + (4/3) * nplots)
+    figsize = (3 + 0.5 * naxes, 2.5 + (4/3) * nplots)
+    figsize = (3 + 0.35 * naxes, 3.0 + (4/3) * nplots)
     if issplit:
         raster = matplotlib.figure.Figure(figsize=figsize)
         agg.FigureCanvasAgg(raster)
@@ -431,7 +433,7 @@ def cli(argv):
     raster, vector = init_figures(args.split, args.vector, naxes, nplots)
 
     for fig in [raster, vector]:
-        fig.subplots_adjust(hspace=0, bottom=0.15, top=0.95, left=0.05, right=0.95)
+        fig.subplots_adjust(hspace=0, bottom=0.4, top=0.95, left=0.02, right=0.98)
 
     for ii in range(nplots):
         rax = raster.add_subplot(nplots, 1, ii+1)
@@ -440,12 +442,9 @@ def cli(argv):
         else:
             vax = rax
 
-        prepare_axes(rax)
-        prepare_axes(vax)
+        prepare_axes(rax, naxes)
+        prepare_axes(vax, naxes)
 
-        xmax = 1.2*naxes
-        rax.set_xlim((-0.30, xmax))
-        vax.set_xlim((-0.30, xmax))
 
         for tt in range(len(tables)):
             table = tables[tt]
@@ -482,9 +481,6 @@ def cli(argv):
             axis_names = [""]*naxes
         drawlimits = drawlimits[:naxes]
         draw_axes(vax, axis_names, drawlimits)
-
-    raster.subplots_adjust(bottom=0.2)
-    vector.subplots_adjust(bottom=0.2)
 
     raster.savefig(args.output)
     if vector != raster:
