@@ -1,5 +1,12 @@
-parallel
-========
+# parallel.py
+
+# Big Fat Disclaimer
+
+This README needs to be rewritten as it's still in the state it was before 
+I ripped the parallel coordinate plot out of my big MOEA study.
+
+## What it does (Out of date!)
+
 Make a parallel coordinate plot from the reference set solutions.
 Also, generate data for AeroVis scatter plots.
 
