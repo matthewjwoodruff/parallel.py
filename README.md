@@ -2,6 +2,9 @@
 
 `parallel.py` is a parallel-coordinate plotting routine written in Python.
 
+![](all_objectives.png)
+
+
 ## Usage Message
 ```
 	usage: parallel.py [-h] [-c COLORS [COLORS ...]] [-C COLUMNS [COLUMNS ...]]
