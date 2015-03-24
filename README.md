@@ -4,7 +4,7 @@
 
 ![](all_objectives.png)
 
-See [invocation examples](invocation) for examples of how to use `parallel.py`.
+See [invocation examples](invocation.md) for examples of how to use `parallel.py`.
 
 
 ## Usage Message
