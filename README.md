@@ -4,6 +4,8 @@
 
 ![](all_objectives.png)
 
+See [invocation examples](invocation) for examples of how to use `parallel.py`.
+
 
 ## Usage Message
 ```
